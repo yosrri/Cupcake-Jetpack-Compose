@@ -120,7 +120,7 @@ fun OrderSummaryScreen(
     }
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 fun OrderSummaryPreview() {
     CupcakeTheme {
