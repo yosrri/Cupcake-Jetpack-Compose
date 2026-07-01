@@ -15,6 +15,8 @@
  */
 package com.example.cupcake
 
+import android.content.Context
+import android.content.Intent
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -35,6 +37,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.core.app.NotificationCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -99,7 +102,7 @@ fun CupcakeApp(
             CupcakeAppBar(
                 currentScreen = currentScreen,
                 canNavigateBack = navController.previousBackStackEntry != null,
-                navigateUp = { navController.navigateUp()}
+                navigateUp = { navController.navigateUp() }
             )
         }
     ) { innerPadding ->
@@ -154,6 +157,7 @@ fun CupcakeApp(
                 )
             }
             composable(route = CupcakeScreen.Summary.name) {
+                val context = LocalContext.current
                 OrderSummaryScreen(
                     orderUiState = uiState,
                     onCancelButtonClicked = {
@@ -163,7 +167,7 @@ fun CupcakeApp(
                         )
                     },
                     onSendButtonClicked = { subject, summary ->
-
+                        shareOrder(context, summary, subject  )
                     },
                     modifier = Modifier.fillMaxHeight()
                 )
@@ -172,7 +176,18 @@ fun CupcakeApp(
     }
 }
 
-private fun cancelOrderAndNavigateToStart(
+private fun shareOrder(context: Context, summary: String, subject: String) {
+    val intent = Intent(Intent.ACTION_SEND).apply {
+        type = "text/plain"
+        putExtra(Intent.EXTRA_SUBJECT, subject)
+        putExtra(Intent.EXTRA_TEXT, summary)
+    }
+    context.startActivity(
+        Intent.createChooser(intent, context.getString(R.string.new_cupcake_order))
+    )
+}
+
+fun cancelOrderAndNavigateToStart(
     viewModel: OrderViewModel,
     navController: NavHostController
 ) {
